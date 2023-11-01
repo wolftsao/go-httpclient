@@ -31,7 +31,7 @@ func getUrls() {
 		panic(err)
 	}
 
-	fmt.Println(response.Status())
-	fmt.Println(response.StatusCode())
+	fmt.Println(response.Status)
+	fmt.Println(response.StatusCode)
 	fmt.Println(response.String())
 }
