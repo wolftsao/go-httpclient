@@ -9,6 +9,8 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/wolftsao/go-httpclient/gomime"
 )
 
 const (
@@ -23,9 +25,9 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 	}
 
 	switch contentType {
-	case "application/json":
+	case gomime.ContentTypeJson:
 		return json.Marshal(body)
-	case "application/xml":
+	case gomime.ContentTypeXml:
 		return xml.Marshal(body)
 	default:
 		return json.Marshal(body)
@@ -77,6 +79,11 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 func (c *httpClient) getHttpClient() *http.Client {
 	c.clientOnce.Do(func() {
+		if c.builder.client != nil {
+			c.client = c.builder.client
+			return
+		}
+
 		c.client = &http.Client{
 			Timeout: c.getConnectionTimeout() + c.getResponseTimeout(),
 			Transport: &http.Transport{
@@ -120,24 +127,4 @@ func (c *httpClient) getConnectionTimeout() time.Duration {
 		return 0
 	}
 	return defaultConnectionTimeout
-}
-
-func (c *httpClient) getRequestHeaders(requestHeaders http.Header) http.Header {
-	result := make(http.Header)
-
-	// Add common headers to the request:
-	for header, value := range c.builder.headers {
-		if len(value) > 0 {
-			result.Set(header, value[0])
-		}
-	}
-
-	// Add custom headers to the request:
-	for header, value := range requestHeaders {
-		if len(value) > 0 {
-			result.Set(header, value[0])
-		}
-	}
-
-	return result
 }
