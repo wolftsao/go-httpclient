@@ -25,3 +25,7 @@ func getHttpClient() gohttp.Client {
 
 	return client
 }
+
+func doSomething() {
+
+}

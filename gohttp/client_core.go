@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/wolftsao/go-httpclient/core"
+	"github.com/wolftsao/go-httpclient/gohttp_mock"
 	"github.com/wolftsao/go-httpclient/gomime"
 )
 
@@ -34,7 +36,7 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 	}
 }
 
-func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*Response, error) {
+func (c *httpClient) do(method string, url string, headers http.Header, body interface{}) (*core.Response, error) {
 	fullHeaders := c.getRequestHeaders(headers)
 
 	requestBody, err := c.getRequestBody(fullHeaders.Get("Content-Type"), body)
@@ -42,7 +44,7 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	if mock := mockupServer.getMock(method, url, string(requestBody)); mock != nil {
+	if mock := gohttp_mock.GetMock(method, url, string(requestBody)); mock != nil {
 		return mock.GetResponse()
 	}
 
@@ -67,11 +69,11 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		return nil, err
 	}
 
-	finalResponse := Response{
-		status:     response.Status,
-		statusCode: response.StatusCode,
-		headers:    response.Header,
-		body:       responseBody,
+	finalResponse := core.Response{
+		Status:     response.Status,
+		StatusCode: response.StatusCode,
+		Headers:    response.Header,
+		Body:       responseBody,
 	}
 
 	return &finalResponse, nil
